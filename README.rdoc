@@ -1,5 +1,4 @@
-== Providers 0.1
-
+== Providers
 
 === Summary
 Providers query webservices like Facebook, Google+, Flickr, YouTube, Twitter, etc, and import the items returned from API calls as nodes in your Drupal site. There  are many advantages to this:
@@ -10,7 +9,7 @@ Providers query webservices like Facebook, Google+, Flickr, YouTube, Twitter, et
 
 * You won't need to include external Javascripts or make API calls with each page load. This will speed up the page load time on your site.
 
-4) You can order, filter, and display content in ways that an API may not allow.
+* You can order, filter, and display content in ways that an API may not allow.
 
 This module only acts as an API for other modules to implement. The next section
 lists providers that have been created.
@@ -23,16 +22,14 @@ YouTube
 
 
 === Creating a new Provider
-Creating a new provider has 3 parts: Defining the provider, querying the API, and
-saving nodes for each item returned by the API. This module creates two hooks: 
-hook_fetch_provider() and hook_set_provider_types(). The easiest way to create a provider
-is to use the [YouTube Provider module as a boilerplate](https://github.com/jtrost/provider_youtube/blob/master/provider_youtube.module).
+Creating a new provider has 3 parts: Defining the provider, querying the API, and saving nodes for each item returned by the API. This module creates two hooks: 
+hook_fetch_provider() and hook_set_provider_types(). The easiest way to create a provider is to use the [YouTube Provider module as a boilerplate](https://github.com/jtrost/provider_youtube/blob/master/provider_youtube.module).
 
 * [Define the provider](https://github.com/jtrost/provider_youtube/blob/master/provider_youtube.module#L100-L117).
 * [Create a curl function](https://github.com/jtrost/provider_youtube/blob/master/provider_youtube.module#L122-L129).
 * [Create a function that assigns the data from each item to fields in the content type](https://github.com/jtrost/provider_youtube/blob/master/provider_youtube.module#L69-L95).
 * Implement hook_fetch_provider(). This function is responsible for running the provider.
- * [Load the provider](https://github.com/jtrost/provider_youtube/blob/master/provider_youtube.module#L7).
- * [Build an URL to curl](https://github.com/jtrost/provider_youtube/blob/master/provider_youtube.module#L10).
- * [Run the curl and create new nodes for each item](https://github.com/jtrost/provider_youtube/blob/master/provider_youtube.module#L17-L42).
- * Create reporting / user feedback to let the user know the import was successful. 
+  * [Load the provider](https://github.com/jtrost/provider_youtube/blob/master/provider_youtube.module#L7).
+  * [Build an URL to curl](https://github.com/jtrost/provider_youtube/blob/master/provider_youtube.module#L10).
+  * [Run the curl and create new nodes for each item](https://github.com/jtrost/provider_youtube/blob/master/provider_youtube.module#L17-L42).
+  * Create reporting / user feedback to let the user know the import was successful. 
