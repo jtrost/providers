@@ -1,0 +1,355 @@
+<?php
+/**
+ * Implements hook_entity_info().
+ */
+function provider_entity_info() {
+  $return['provider'] = array(
+    'label' => t('Provider'),
+    'controller class' => 'ProviderController',
+    'base table' => 'provider',
+    'revision table' => 'provider_revision',
+    'uri callback' => 'provider_uri',
+    'fieldable' => TRUE,
+    'entity keys' => array(
+      'id' => 'pid',
+      'revision' => 'vid',
+      'bundle' => 'type',
+      'label' => 'title',
+     ),
+    'bundle keys' => array(
+      'bundle' => 'type',
+    ),
+    'static cache' => TRUE,
+    'bundles' => array(),
+    'view modes' => array(
+      'full' => array(
+        'label' => t('Full content'),
+        'custom settings' => FALSE,
+      ),
+      'teaser' => array(
+        'label' => t('Teaser'),
+        'custom settings' => FALSE,
+      ),
+    ),
+  );
+
+  foreach (provider_types() as $type => $info) {
+    $return['provider']['bundles'][$type] = array(
+      'label' => $info->name,
+      'admin' => array(
+        'path' => 'admin/structure/providers/manage/%provider_type',
+        'real path' => 'admin/structure/providers/manage/' . str_replace('_', '-', $type),
+        'bundle argument' => 4,
+        'access arguments' => array('administer providers'),
+      ),
+    );
+  }
+
+  return $return;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function provider_menu() {
+  $items['admin/structure/providers'] = array(
+    'title' => 'Providers',
+    'description' => 'Import API results as nodes.',
+    'page callback' => 'provider_overview_types',
+    'access arguments' => array('administer providers'),
+    'file' => 'provider.pages.inc',
+  );
+  $items['admin/structure/providers/manage/%provider_type'] = array(
+    'title' => 'View provider type',
+    'title callback' => 'provider_type_page_title',
+    'title arguments' => array(4),
+    'page callback' => 'provider_information',
+    'page arguments' => array(4),
+    'access arguments' => array('administer providers'),
+    'file' => 'provider.pages.inc',
+  );
+  $items['admin/structure/providers/manage/%provider_type/view'] = array(
+    'title' => 'View',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['admin/structure/providers/add'] = array(
+    'title' => 'Add new provider',
+    'page callback' => 'provider_add_page',
+    'access arguments' => array('create providers'),
+    'weight' => 1,
+    'file' => 'provider.pages.inc',
+  );
+  foreach (provider_types() as $type) {
+    $type_url_str = str_replace('_', '-', $type->type);
+    $items['provider/add/' . $type_url_str] = array(
+      'title' => $type->name,
+      'title callback' => 'check_plain',
+      'page callback' => 'provider_add',
+      'page arguments' => array(2),
+      'access arguments' => array('create providers'),
+      'description' => $type->description,
+      'file' => 'provider.pages.inc',
+    );
+    $items['admin/structure/providers/manage/%provider_type/list'] = array(
+      'title' => $type->name . 'Providers',
+      'page callback' => 'provider_list',
+      'access arguments' => array('view providers'),
+      'description' => $type->description,
+      'file' => 'provider.pages.inc',
+    );
+  }
+  $items['provider/%provider'] = array(
+    'title callback' => 'provider_page_title',
+    'title arguments' => array(1),
+    'page callback' => 'provider_page_view',
+    'page arguments' => array(1),
+    'access arguments' => array('view providers'),
+    'type' => MENU_CALLBACK,
+    'file' => 'provider.pages.inc',
+  );
+  $items['provider/%provider/view'] = array(
+    'title' => 'View',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+  $items['provider/%provider/edit'] = array(
+    'title' => 'Edit',
+    'page callback' => 'provider_page_edit',
+    'page arguments' => array(1),
+    'access arguments' => array('update providers'),
+    'weight' => 0,
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'provider.pages.inc',
+  );
+  $items['provider/%provider/delete'] = array(
+    'title' => 'Delete',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('provider_delete_confirm', 1),
+    'access arguments' => array('delete providers'),
+    'weight' => 1,
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_INLINE,
+    'file' => 'provider.pages.inc',
+  );
+  $items['provider/%provider/update'] = array(
+    'title' => 'Update',
+    'description' => 'Retrieve new items for this provider.',
+    'page callback' => 'provider_update_provider',
+    'access arguments' => array('update providers'),
+    'type' => MENU_LOCAL_TASK,
+  );
+  return $items;
+}
+
+/**
+ * Fetch the feed and create / update nodes
+ */
+function provider_update_provider() {
+  module_invoke_all('fetch_provider');
+}
+
+/**
+ * Get a list of all provider types available.
+ *
+ * @return array
+ *   An array of provider type objects. Note that the "type" key matches what
+ *   was defined as the main key in hook_entity_info().
+ */
+function provider_types() {
+  return module_invoke_all('set_provider_types');
+}
+
+/**
+ * Implements hook_cron()
+ * Update every provider each time cron runs.
+ */
+function provider_cron() {
+  provider_update_provider();
+}
+
+/**
+ * Implements hook_permission()
+ */
+function provider_permission() {
+  return array(
+    'administer providers' => array(
+      'title' => t('Administer providers'),
+    ),
+    'create providers' => array(
+      'title' => t('Create providers'),
+    ),
+    'delete providers' => array(
+      'title' => t('Delete providers'),
+    ),
+    'update providers' => array(
+      'title' => t('Update providers'),
+    ),
+    'View providers' => array(
+      'title' => t('View providers'),
+    ),
+  );
+}
+
+/**
+ * Get an individual provider type definition object.
+ *
+ * @param $type
+ *   The key of the provider type we want.
+ * @return object
+ *   The specified provider type.
+ */
+function provider_type_load($type) {
+  $types = provider_types();
+  $type = str_replace('-', '_', $type);
+  return isset($types[$type]) ? $types[$type] : FALSE;
+}
+
+/**
+ * Load a provider object from the database.
+ *
+ * @param $pid
+ *   The provider ID.
+ * @param $vid
+ *   The revision ID.
+ * @param $reset
+ *   Whether to reset the provider_load_multiple cache.
+ *
+ * @return
+ *   A fully-populated node object.
+ */
+function provider_load($pid = NULL, $vid = NULL, $reset = FALSE) {
+  $pids = (isset($pid) ? array($pid) : array());
+  $conditions = (isset($vid) ? array('vid' => $vid) : array());
+  $provider = provider_load_multiple($pids, $conditions, $reset);
+  return $provider ? reset($provider) : FALSE;
+}
+
+/**
+ * Load provider entities from the database.
+ *
+ * This function should be used whenever you need to load more than one provider
+ * from the database. Providers are loaded into memory and will not require
+ * database access if loaded again during the same page request.
+ *
+ * @see entity_load()
+ *
+ * @param $pids
+ *   An array of provider IDs.
+ * @param $conditions
+ *   An array of conditions on the {provider} table in the form 'field' => $value.
+ * @param $reset
+ *   Whether to reset the internal entity_load cache.
+ *
+ * @return
+ *   An array of node objects indexed by nid.
+ */
+function provider_load_multiple($pids = array(), $conditions = array(), $reset = FALSE) {
+  return entity_load('provider', $pids, $conditions, $reset);
+}
+
+/**
+ * Sets the page title based on the specified provider.
+ *
+ * @param $provider
+ *   The provider object.
+ */
+function provider_page_title($provider) {
+  return $provider->title;
+}
+
+/**
+ * Implements hook_forms().
+ *
+ * All provider forms share the same form handler.
+ */
+function provider_forms() {
+  $forms = array();
+  if ($types = provider_types()) {
+    foreach (array_keys($types) as $type) {
+      $forms[$type . '_provider_form']['callback'] = 'provider_form';
+    }
+  }
+  return $forms;
+}
+
+/**
+ * Menu title callback.
+ *
+ * @param $type
+ *   The provider type.
+ * @return string
+ *   The human-friendly name of the provider type.
+ */
+function provider_type_page_title($type) {
+  return t('Manage @type', array('@type' => $type->name));
+}
+
+/**
+ * Save a provider.
+ *
+ * @param $provider
+ *   The provider to be saved.
+ * @return
+ *   The saved provider, now with an pid if necessary.
+ */
+function provider_save($provider) {
+  return entity_get_controller('provider')->save($provider);
+}
+
+/**
+ * Returns an initialized provider object.
+ *
+ * @param $type
+ *   The machine-readable type of the provider.
+ *
+ * @return
+ *   An provider object with all default fields initialized.
+ */
+function provider_new($type = '') {
+  return entity_get_controller('provider')->create($type);
+}
+
+
+/**
+ * Deletes a provider by ID.
+ *
+ * @param $pid
+ *   The ID of the product to delete.
+ *
+ * @return
+ *   TRUE on success, FALSE otherwise.
+ */
+function provider_delete($pid) {
+  return provider_delete_multiple(array($pid));
+}
+
+/**
+ * Deletes multiple providers by ID.
+ *
+ * @param $pids
+ *   An array of provider IDs to delete.
+ *
+ * @return
+ *   TRUE on success, FALSE otherwise.
+ */
+function provider_delete_multiple($pids) {
+  return entity_get_controller('provider')->delete($pids);
+}
+
+/**
+ * Implements hook_admin_paths_alter().
+ * Allow provider/add/* pages to be opened in the overlay window.
+ */
+function provider_admin_paths_alter(&$paths) {
+  $paths['provider/add/*'] = TRUE;
+}
+
+/**
+ * Entity uri callback.
+ */
+function provider_uri($provider) {
+  return array(
+    'path' => 'provider/' . $provider->pid,
+  );
+}

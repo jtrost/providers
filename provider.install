@@ -1,0 +1,99 @@
+<?php
+function provider_schema() {
+  $schema['provider'] = array(
+    'description' => 'The base table for providers.',
+    'fields' => array(
+      'pid' => array(
+        'description' => 'The primary identifier for a provider.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'vid' => array(
+        'description' => 'The current {provider_revision}.vid version identifier.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'type' => array(
+        'description' => 'The {provider_type} of this provider.',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'title' => array(
+        'description' => 'The title of this provider.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'created' => array(
+        'description' => 'The Unix timestamp when the provider was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'changed' => array(
+        'description' => 'The Unix timestamp when the provider was most recently saved.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+
+    ),
+    'unique keys' => array(
+      'pid_vid' => array('pid', 'vid'),
+      'pid'     => array('pid')
+      ),
+    'primary key' => array('pid'),
+  );
+
+  $schema['provider_revision'] = array(
+    'description' => 'Stores information about each saved version of an {provider}.',
+    'fields' => array(
+      'pid' => array(
+        'description' => 'The {provider} this version belongs to.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'vid' => array(
+        'description' => 'The primary identifier for this version.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'title' => array(
+        'description' => 'The title of this version.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'created' => array(
+        'description' => 'The Unix timestamp when the provider was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'indexes' => array(
+      'pid' => array('pid'),
+    ),
+    'primary key' => array('vid'),
+    'foreign keys' => array(
+      'provider' => array(
+        'table' => 'provider',
+        'columns' => array(
+          'pid' => 'pid',
+        ),
+      ),
+    ),
+  );
+
+  return $schema;
+}
