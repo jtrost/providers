@@ -16,7 +16,7 @@ lists providers that have been created.
 
 
 === Providers
-YouTube
+==== YouTube
   Drupal: https://drupal.org/sandbox/jtrost/2049661
   Github: https://github.com/jtrost/provider_youtube
 
