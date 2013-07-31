@@ -1,8 +1,8 @@
 <?php
+
 /**
  * @file
- *
- * provider.install
+ * Database migration for providers.
  */
 function provider_schema() {
   $schema['provider'] = array(

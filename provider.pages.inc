@@ -1,8 +1,8 @@
 <?php
+
 /**
  * @file
- *
- * provider.pages.inc
+ * Creates admin pages.
  */
 
 /**

@@ -2,11 +2,9 @@
 
 /**
  * @file
- *
  * Controller for loading, creating, and saving providers.
- *
- * The default loader, which we extend, handles load() already. We only
- * need to add saving and creating.
+ * The default loader, which we extend, handles load() already.
+ * We only need to add saving and creating.
  */
 class ProviderController extends DrupalDefaultEntityController {
 
