@@ -1,6 +1,8 @@
 <?php
 /**
  * @file
+ *
+ * provider.install
  */
 function provider_schema() {
   $schema['provider'] = array(

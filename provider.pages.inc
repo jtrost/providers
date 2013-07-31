@@ -1,6 +1,8 @@
 <?php
 /**
  * @file
+ *
+ * provider.pages.inc
  */
 
 /**
@@ -111,14 +113,14 @@ function provider_add_page() {
  * Menu callback; Provider information page.
  *
  * @param object $provider_type
+ *   The type of provider.
  */
 function provider_information($provider_type) {
   return $provider_type->name . ': ' . $provider_type->description;
 }
 
 /**
- * Menu callback; presents the provider editing form, or redirects to delete
- * confirmation.
+ * Menu callback; shows the provider edit form or redirects to delete.
  *
  * @param object $provider
  *   The provider object to edit.

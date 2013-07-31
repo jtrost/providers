@@ -2,6 +2,7 @@
 
 /**
  * @file
+ *
  * Controller for loading, creating, and saving providers.
  *
  * The default loader, which we extend, handles load() already. We only
@@ -9,14 +10,15 @@
  */
 class ProviderController extends DrupalDefaultEntityController {
 
-/**
- * Creates a transaction to save a provider and a revision.
- * @param object $provider
- *   The fully loaded provider object.
- *
- * @return object
- *   The saved provider.
- */
+  /**
+   * Creates a transaction to save a provider and a revision.
+   *
+   * @param object $provider
+   *   The fully loaded provider object.
+   *
+   * @return object
+   *   The saved provider.
+   */
   public function save($provider) {
     $transaction = db_transaction();
 
@@ -118,7 +120,7 @@ class ProviderController extends DrupalDefaultEntityController {
    *   TRUE or FALSE indicating whether or not the existing revision should be
    *     updated instead of a new one created.
    */
-  private function saveRevision($provider, $uid, $update = FALSE) {
+  protected function saveRevision($provider, $uid, $update = FALSE) {
     // Hold on to the provider's original creator_uid but swap in the revision's
     // creator_uid for the momentary write.
     $temp_uid = $provider->uid;
