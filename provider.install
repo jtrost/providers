@@ -4,6 +4,10 @@
  * @file
  * Database migration for providers.
  */
+
+ /**
+  * Implements hook_schema().
+  */
 function provider_schema() {
   $schema['provider'] = array(
     'description' => 'The base table for providers.',
