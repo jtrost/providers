@@ -167,7 +167,7 @@ function provider_types() {
 }
 
 /**
- * Implements hook_cron(). Update every provider each time cron runs.
+ * Implements hook_cron().
  */
 function provider_cron() {
   provider_update_provider();
