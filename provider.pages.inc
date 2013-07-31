@@ -1,5 +1,9 @@
 <?php
 /**
+ * @file
+ */
+
+/**
  * List all providers of the specified type and provide some helpful links.
  */
 function provider_list() {
@@ -10,12 +14,12 @@ function provider_list() {
     ->entityCondition('type', arg(4));
   $result = $query->execute();
 
-  if($result) {
+  if ($result) {
     foreach ($result as $entity) {
       $entity = reset($entity);
       $provider = provider_load(intval($entity->pid));
 
-      $row[] = array('data' => t($provider->title));
+      $row[] = array('data' => $provider->title);
       $row[] = array('data' => l(t('view'), 'provider/' . $provider->pid));
       $row[] = array('data' => l(t('edit'), 'provider/' . $provider->pid . '/edit'));
       $row[] = array('data' => l(t('update'), 'provider/' . $provider->pid . '/update'));
@@ -36,9 +40,9 @@ function provider_list() {
 /**
  * Displays a provider.
  *
- * @param $provider
+ * @param object $provider
  *   The provider object to display.
- * @param $view_mode
+ * @param string $view_mode
  *   The view mode we want to display.
  */
 function provider_page_view($provider, $view_mode = 'full') {
@@ -56,7 +60,7 @@ function provider_page_view($provider, $view_mode = 'full') {
   field_attach_prepare_view('provider', array($provider->pid => $provider), $view_mode);
   entity_prepare_view('provider', array($provider->pid => $provider));
   $provider->content += field_attach_view('provider', $provider, $view_mode);
-  
+
   return $provider->content;
 }
 
@@ -71,7 +75,7 @@ function provider_overview_types() {
 
   foreach ($types as $type) {
     $type_url_str = str_replace('_', '-', $type->type);
-    $row[] = array('data' => t($type->name));
+    $row[] = array('data' => $type->name);
     $row[] = array('data' => l(t('list'), 'admin/structure/providers/manage/' . $type_url_str . '/list'));
     $row[] = array('data' => l(t('add'), 'provider/add/' . $type_url_str));
     $row[] = array('data' => l(t('manage fields'), 'admin/structure/providers/manage/' . $type_url_str . '/fields'));
@@ -95,9 +99,9 @@ function provider_overview_types() {
 function provider_add_page() {
   $types = provider_types();
   $items = array();
-  
+
   foreach ($types as $type) {
-    array_push($items, l($type->name, "provider/add/".$type->type));
+    array_push($items, l($type->name, "provider/add/" . $type->type));
   }
 
   return theme('item_list', array('items' => $items, 'title' => 'Available Providers'));
@@ -113,9 +117,10 @@ function provider_information($provider_type) {
 }
 
 /**
- * Menu callback; presents the provider editing form, or redirects to delete confirmation.
+ * Menu callback; presents the provider editing form, or redirects to delete
+ * confirmation.
  *
- * @param $provider
+ * @param object $provider
  *   The provider object to edit.
  */
 function provider_page_edit($provider) {
@@ -146,10 +151,15 @@ function provider_add($type) {
 /**
  * Form builder; Displays the provider add/edit form.
  *
- * @param $form
- * @param $form_state
- * @param $provider
+ * @param array $form
+ *   The form array.
+ * @param array $form_state
+ *   The form state.
+ * @param object $provider
  *   The provider object to edit, which may be brand new.
+ *
+ * @return array
+ *   The altered $form.
  */
 function provider_form($form, &$form_state, $provider) {
   // Set the id and identify this as an provider edit form.
@@ -201,6 +211,11 @@ function provider_form($form, &$form_state, $provider) {
 
 /**
  * Form bulder; Validate form submission.
+ *
+ * @param array $form
+ *   The form array.
+ * @param array $form_state
+ *   The form state.
  */
 function provider_form_validate($form, &$form_state) {
   $provider = $form_state['provider'];
@@ -210,7 +225,12 @@ function provider_form_validate($form, &$form_state) {
 }
 
 /**
- * Form bulder; Submit the provider
+ * Form bulder; Submit the provider.
+ *
+ * @param array $form
+ *   The form array.
+ * @param array $form_state
+ *   The form state.
  */
 function provider_form_submit($form, &$form_state) {
   global $user;
@@ -238,7 +258,12 @@ function provider_form_submit($form, &$form_state) {
 }
 
 /**
- * Form bulder; Delete a provider
+ * Form bulder; Delete a provider.
+ *
+ * @param array $form
+ *   The form array.
+ * @param array $form_state
+ *   The form state.
  */
 function provider_form_delete_submit($form, &$form_state) {
   $destination = array();
@@ -252,6 +277,13 @@ function provider_form_delete_submit($form, &$form_state) {
 
 /**
  * Form bulder; Asks for confirmation of provider deletion.
+ *
+ * @param array $form
+ *   The form array.
+ * @param array $form_state
+ *   The form state.
+ * @param object $provider
+ *   The provider object to edit, which may be brand new.
  */
 function provider_delete_confirm($form, &$form_state, $provider) {
   $form['#provider'] = $provider;
@@ -268,6 +300,11 @@ function provider_delete_confirm($form, &$form_state, $provider) {
 
 /**
  * Executes provider deletion.
+ *
+ * @param array $form
+ *   The form array.
+ * @param array $form_state
+ *   The form state.
  */
 function provider_delete_confirm_submit($form, &$form_state) {
   if ($form_state['values']['confirm']) {

@@ -1,4 +1,7 @@
 <?php
+/**
+ * @file
+ */
 function provider_schema() {
   $schema['provider'] = array(
     'description' => 'The base table for providers.',
@@ -46,8 +49,8 @@ function provider_schema() {
     ),
     'unique keys' => array(
       'pid_vid' => array('pid', 'vid'),
-      'pid'     => array('pid')
-      ),
+      'pid'     => array('pid'),
+    ),
     'primary key' => array('pid'),
   );
 

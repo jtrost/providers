@@ -1,5 +1,9 @@
 <?php
 /**
+ * @file
+ */
+
+/**
  * Implements hook_entity_info().
  */
 function provider_entity_info() {
@@ -15,7 +19,7 @@ function provider_entity_info() {
       'revision' => 'vid',
       'bundle' => 'type',
       'label' => 'title',
-     ),
+    ),
     'bundle keys' => array(
       'bundle' => 'type',
     ),
@@ -143,7 +147,7 @@ function provider_menu() {
 }
 
 /**
- * Fetch the feed and create / update nodes
+ * Fetch the feed and create / update nodes.
  */
 function provider_update_provider() {
   module_invoke_all('fetch_provider');
@@ -161,7 +165,7 @@ function provider_types() {
 }
 
 /**
- * Implements hook_cron()
+ * Implements hook_cron().
  * Update every provider each time cron runs.
  */
 function provider_cron() {
@@ -169,7 +173,7 @@ function provider_cron() {
 }
 
 /**
- * Implements hook_permission()
+ * Implements hook_permission().
  */
 function provider_permission() {
   return array(
@@ -194,8 +198,9 @@ function provider_permission() {
 /**
  * Get an individual provider type definition object.
  *
- * @param $type
+ * @param string $type
  *   The key of the provider type we want.
+ *
  * @return object
  *   The specified provider type.
  */
@@ -208,14 +213,14 @@ function provider_type_load($type) {
 /**
  * Load a provider object from the database.
  *
- * @param $pid
+ * @param int $pid
  *   The provider ID.
- * @param $vid
+ * @param int $vid
  *   The revision ID.
- * @param $reset
+ * @param bool $reset
  *   Whether to reset the provider_load_multiple cache.
  *
- * @return
+ * @return object
  *   A fully-populated node object.
  */
 function provider_load($pid = NULL, $vid = NULL, $reset = FALSE) {
@@ -228,20 +233,21 @@ function provider_load($pid = NULL, $vid = NULL, $reset = FALSE) {
 /**
  * Load provider entities from the database.
  *
- * This function should be used whenever you need to load more than one provider
- * from the database. Providers are loaded into memory and will not require
- * database access if loaded again during the same page request.
+ * This function should be used whenever you need to load more than one
+ * provider from the database. Providers are loaded into memory and will not
+ * require database access if loaded again during the same page request.
  *
  * @see entity_load()
  *
- * @param $pids
+ * @param array $pids
  *   An array of provider IDs.
- * @param $conditions
- *   An array of conditions on the {provider} table in the form 'field' => $value.
- * @param $reset
+ * @param array $conditions
+ *   An array of conditions on the {provider} table in the form 
+ *   'field' => $value.
+ * @param bool $reset
  *   Whether to reset the internal entity_load cache.
  *
- * @return
+ * @return array
  *   An array of node objects indexed by nid.
  */
 function provider_load_multiple($pids = array(), $conditions = array(), $reset = FALSE) {
@@ -251,8 +257,11 @@ function provider_load_multiple($pids = array(), $conditions = array(), $reset =
 /**
  * Sets the page title based on the specified provider.
  *
- * @param $provider
+ * @param object $provider
  *   The provider object.
+ *
+ * @return string
+ *   The title of the provider.
  */
 function provider_page_title($provider) {
   return $provider->title;
@@ -276,8 +285,9 @@ function provider_forms() {
 /**
  * Menu title callback.
  *
- * @param $type
+ * @param string $type
  *   The provider type.
+ *
  * @return string
  *   The human-friendly name of the provider type.
  */
@@ -288,9 +298,10 @@ function provider_type_page_title($type) {
 /**
  * Save a provider.
  *
- * @param $provider
+ * @param object $provider
  *   The provider to be saved.
- * @return
+ *
+ * @return bool
  *   The saved provider, now with an pid if necessary.
  */
 function provider_save($provider) {
@@ -300,10 +311,10 @@ function provider_save($provider) {
 /**
  * Returns an initialized provider object.
  *
- * @param $type
+ * @param string $type
  *   The machine-readable type of the provider.
  *
- * @return
+ * @return object
  *   An provider object with all default fields initialized.
  */
 function provider_new($type = '') {
@@ -314,10 +325,10 @@ function provider_new($type = '') {
 /**
  * Deletes a provider by ID.
  *
- * @param $pid
+ * @param int $pid
  *   The ID of the product to delete.
  *
- * @return
+ * @return bool
  *   TRUE on success, FALSE otherwise.
  */
 function provider_delete($pid) {
@@ -327,10 +338,10 @@ function provider_delete($pid) {
 /**
  * Deletes multiple providers by ID.
  *
- * @param $pids
+ * @param array $pids
  *   An array of provider IDs to delete.
  *
- * @return
+ * @return bool
  *   TRUE on success, FALSE otherwise.
  */
 function provider_delete_multiple($pids) {
@@ -339,7 +350,6 @@ function provider_delete_multiple($pids) {
 
 /**
  * Implements hook_admin_paths_alter().
- * Allow provider/add/* pages to be opened in the overlay window.
  */
 function provider_admin_paths_alter(&$paths) {
   $paths['provider/add/*'] = TRUE;
@@ -347,6 +357,12 @@ function provider_admin_paths_alter(&$paths) {
 
 /**
  * Entity uri callback.
+ *
+ * @param object $provider
+ *   The provider object.
+ *
+ * @return array
+ *   An associative array with a path to the provider.
  */
 function provider_uri($provider) {
   return array(

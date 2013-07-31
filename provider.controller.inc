@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * @file
  * Controller for loading, creating, and saving providers.
  *
  * The default loader, which we extend, handles load() already. We only
@@ -8,6 +9,14 @@
  */
 class ProviderController extends DrupalDefaultEntityController {
 
+/**
+ * Creates a transaction to save a provider and a revision.
+ * @param object $provider
+ *   The fully loaded provider object.
+ *
+ * @return object
+ *   The saved provider.
+ */
   public function save($provider) {
     $transaction = db_transaction();
 
@@ -101,15 +110,15 @@ class ProviderController extends DrupalDefaultEntityController {
   /**
    * Saves a provider revision with the uid of the current user.
    *
-   * @param $provider
+   * @param object $provider
    *   The fully loaded provider object.
-   * @param $uid
+   * @param int $uid
    *   The user's uid for the current revision.
-   * @param $update
+   * @param bool $update
    *   TRUE or FALSE indicating whether or not the existing revision should be
    *     updated instead of a new one created.
    */
-  function saveRevision($provider, $uid, $update = FALSE) {
+  private function saveRevision($provider, $uid, $update = FALSE) {
     // Hold on to the provider's original creator_uid but swap in the revision's
     // creator_uid for the momentary write.
     $temp_uid = $provider->uid;
@@ -120,21 +129,22 @@ class ProviderController extends DrupalDefaultEntityController {
       drupal_write_record('provider_revision', $provider, 'vid');
     }
     else {
-      // Otherwise insert a new revision. This will automatically update $provider
-      // to include the vid.
+      // Otherwise insert a new revision. This will automatically update
+      // $provider to include the vid.
       drupal_write_record('provider_revision', $provider);
     }
 
     // Reset the order's creator_uid to the original value.
     $provider->uid = $temp_uid;
- }
+  }
 
   /**
    * Deletes multiple providers by ID.
    *
-   * @param $pids
+   * @param array $pids
    *   An array of provider IDs to delete.
-   * @return
+   *
+   * @return bool
    *   TRUE on success, FALSE otherwise.
    */
   public function delete($pids) {
@@ -179,10 +189,10 @@ class ProviderController extends DrupalDefaultEntityController {
   /**
    * Create a default provider.
    *
-   * @param $type
+   * @param string $type
    *   The machine-readable type of the provider.
    *
-   * @return
+   * @return object
    *   An provider object with all default fields initialized.
    */
   public function create($type = '') {
